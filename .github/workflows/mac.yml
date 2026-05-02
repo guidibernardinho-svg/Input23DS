@@ -1,0 +1,43 @@
+name: Build Input23DS macOS
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.3'
+          host: 'mac'
+          target: 'desktop'
+
+      - name: Configure build
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+
+      - name: Build app
+        run: |
+          cd build
+          cmake --build .
+
+      - name: Package .app
+        run: |
+          cd build
+          macdeployqt Input23DS.app
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Input23DS-macOS
+          path: build/Input23DS.app
