@@ -10,7 +10,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install Qt
@@ -19,22 +19,21 @@ jobs:
           version: '6.5.3'
           host: 'mac'
           target: 'desktop'
+          cache: true
 
-      - name: Configure build
+      - name: Configure
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake .. -DCMAKE_PREFIX_PATH=$Qt6_DIR
 
-      - name: Build app
+      - name: Build
         run: |
-          cd build
-          cmake --build .
+          cmake --build build
 
-      - name: Package .app
+      - name: Deploy app
         run: |
-          cd build
-          macdeployqt Input23DS.app
+          $Qt6_DIR/bin/macdeployqt build/Input23DS.app
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
