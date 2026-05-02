@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-mac:
+  build:
     runs-on: macos-latest
 
     steps:
@@ -21,22 +21,26 @@ jobs:
           target: 'desktop'
           cache: true
 
-      - name: Configure
+      - name: Show Qt path (debug)
         run: |
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_PREFIX_PATH=$Qt6_DIR
+          echo "Qt path:"
+          echo $Qt6_DIR
+          ls $Qt6_DIR
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build -DCMAKE_PREFIX_PATH=$Qt6_DIR
 
       - name: Build
         run: |
-          cmake --build build
+          cmake --build build --config Release
 
-      - name: Deploy app
+      - name: Find app
         run: |
-          $Qt6_DIR/bin/macdeployqt build/Input23DS.app
+          find build -name "*.app" || true
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Input23DS-macOS
-          path: build/Input23DS.app
+          path: build
